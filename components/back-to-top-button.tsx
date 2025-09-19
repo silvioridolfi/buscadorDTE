@@ -36,17 +36,11 @@ export default function BackToTopButton() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-r from-[#00AEC3] to-[#417099] hover:from-[#00c8e0] hover:to-[#365d80] text-white rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(0,174,195,0.6)] transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-[#00AEC3]/50 group animate-glow-pulse glass-enhanced border border-[#00AEC3]/30"
+      className="fixed bottom-6 right-6 z-50 p-3 bg-[#00AEC3] hover:bg-[#008fa0] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#00AEC3] focus:ring-offset-2 group"
       aria-label="Volver al inicio"
       title="Volver al inicio"
     >
-      <ChevronUp className="w-7 h-7 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-125 animate-pulse-glow" />
-
-      {/* Pulsing glow ring */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#00AEC3]/30 to-[#417099]/30 blur-lg animate-pulse-glow -z-10" />
-
-      {/* Neón effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#00AEC3] to-[#417099] opacity-0 group-hover:opacity-20 transition-opacity duration-300 animate-glow-pulse" />
+      <ChevronUp className="w-6 h-6 transition-transform duration-200 group-hover:-translate-y-0.5" />
     </button>
   )
 }
