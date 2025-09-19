@@ -38,9 +38,8 @@ export default function SchoolFinder() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Enhanced Header with scanline effect */}
+      {/* Enhanced Header sin scanline effect */}
       <div className="text-center mb-16 relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00AEC3]/10 to-transparent animate-scanline pointer-events-none"></div>
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight relative z-10">
           Buscador de{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e81f76] to-[#00AEC3] animate-pulse-glow">

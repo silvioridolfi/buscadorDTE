@@ -17,9 +17,6 @@ export default function Footer() {
               className="h-10 sm:h-16 md:h-20 lg:h-24 w-auto max-w-full filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105 relative z-10"
               priority
             />
-
-            {/* Scan line effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 opacity-0 group-hover:opacity-100" />
           </div>
         </div>
 

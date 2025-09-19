@@ -132,10 +132,8 @@ export default function SearchInput({ onSearch, onClear, loading, hasResults }: 
         </div>
       </form>
 
-      {/* Subtle scan line effect */}
-      <div className="mt-4 h-px bg-gradient-to-r from-transparent via-[#00AEC3]/30 to-transparent relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00AEC3] to-transparent w-1/3 animate-scanline opacity-60" />
-      </div>
+      {/* Simple gradient line */}
+      <div className="mt-4 h-px bg-gradient-to-r from-transparent via-[#00AEC3]/30 to-transparent"></div>
     </div>
   )
 }

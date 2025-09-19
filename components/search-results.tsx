@@ -45,18 +45,13 @@ export default function SearchResults({
           <p className="text-gray-400 text-sm">Analizando base de datos • Esto puede tomar unos segundos</p>
         </div>
 
-        {/* Scan lines effect */}
+        {/* Static progress lines */}
         <div className="mt-8 space-y-2">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="h-px bg-gradient-to-r from-transparent via-[#00AEC3]/30 to-transparent mx-auto w-64 relative overflow-hidden"
-            >
-              <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00AEC3] to-transparent w-1/4 animate-scanline opacity-60"
-                style={{ animationDelay: `${i * 0.5}s` }}
-              />
-            </div>
+              className="h-px bg-gradient-to-r from-transparent via-[#00AEC3]/30 to-transparent mx-auto w-64"
+            />
           ))}
         </div>
       </div>
