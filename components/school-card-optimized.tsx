@@ -54,230 +54,264 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
   const isEscuelaCerrada = planEnlace.includes("ESCUELA CERRADA")
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group border border-gray-700 h-full flex flex-col hover:scale-[1.02]">
-      <div className="p-6 space-y-4 flex-1">
-        {/* 🏫 School Name */}
-        <div>
-          <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#00AEC3] transition-colors duration-200 leading-tight">
-            {school.nombre}
-          </h3>
-        </div>
+    <div className="group relative h-full flex flex-col transform transition-all duration-500 hover:scale-105 laser-border">
+      {/* Enhanced card background with glassmorphism */}
+      <div className="glass-enhanced rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50 h-full flex flex-col hover:shadow-[0_0_50px_rgba(0,174,195,0.3)] transition-all duration-500">
+        {/* Animated background glow on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#e81f76]/5 to-[#00AEC3]/5 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-3xl" />
 
-        {/* 🔢 CUE and Predio */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#417099]/20 border border-[#417099]/30">
-            <Hash className="w-3.5 h-3.5 text-[#00AEC3]" />
-            <span className="text-xs font-medium text-[#00AEC3]">CUE: {school.cue}</span>
-          </div>
-          {school.predio && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00AEC3]/20 border border-[#00AEC3]/30">
-              <Building className="w-3.5 h-3.5 text-[#00AEC3]" />
-              <span className="text-xs font-medium text-[#00AEC3]">Predio: {school.predio}</span>
-            </div>
-          )}
-
-          {/* Badge amarillo para Contexto de encierro - SOLO UNO */}
-          {isContextoEncierro && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500 text-white border border-yellow-600">
-              <AlertTriangle className="w-3.5 h-3.5 text-white" />
-              <span className="text-xs font-medium text-white">Contexto de encierro</span>
-            </div>
-          )}
-
-          {/* Badge rojo para Escuela cerrada - SOLO UNO */}
-          {isEscuelaCerrada && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 text-white border border-red-600">
-              <X className="w-3.5 h-3.5 text-white" />
-              <span className="text-xs font-medium text-white">Escuela cerrada</span>
-            </div>
-          )}
-        </div>
-
-        {/* 📍 Address, Location and District */}
-        <div className="space-y-2">
-          {school.direccion && (
-            <div className="flex items-start gap-2">
-              <Home className="w-4 h-4 text-[#00AEC3] mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-gray-400 uppercase tracking-wide">DIRECCIÓN</p>
-                <p className="text-base font-semibold text-white">{school.direccion}</p>
-              </div>
-            </div>
-          )}
-          {location && (
-            <div className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 text-[#00AEC3] mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-gray-400 uppercase tracking-wide">LOCALIDAD</p>
-                <p className="text-base font-semibold text-white">{location}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 🎓 Level + Modality */}
-        {(school.nivel || school.modalidad) && (
-          <div className="flex items-start gap-2">
-            <GraduationCap className="w-4 h-4 text-[#417099] mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-400 uppercase tracking-wide">NIVEL Y MODALIDAD</p>
-              <p className="text-base font-semibold text-white">
-                {school.nivel && school.modalidad
-                  ? `${school.nivel} • ${school.modalidad}`
-                  : school.nivel || school.modalidad}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* 👥 Total Enrollment - Sections */}
-        {(school.matricula || school.secciones) && (
-          <div className="flex items-start gap-2">
-            <Users className="w-4 h-4 text-[#e81f76] mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-400 uppercase tracking-wide">MATRÍCULA Y SECCIONES</p>
-              <p className="text-base font-semibold text-white">
-                {school.matricula && school.secciones
-                  ? `${school.matricula} estudiantes – ${school.secciones} secciones`
-                  : school.matricula
-                    ? `${school.matricula} estudiantes`
-                    : `${school.secciones} secciones`}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* ♂ Boys / ♀ Girls */}
-        {(school.varones || school.mujeres) && (
-          <div className="flex items-start gap-2">
-            <Users className="w-4 h-4 text-[#00AEC3] mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-400 uppercase tracking-wide">DISTRIBUCIÓN POR GÉNERO</p>
-              <p className="text-base font-semibold text-white">
-                {school.varones && school.mujeres
-                  ? `♂ ${school.varones} varones – ♀ ${school.mujeres} mujeres`
-                  : school.varones
-                    ? `♂ ${school.varones} varones`
-                    : `♀ ${school.mujeres} mujeres`}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* ⏰ Shifts */}
-        {school.turnos && (
-          <div className="flex items-start gap-2">
-            <Clock className="w-4 h-4 text-[#417099] mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-400 uppercase tracking-wide">TURNOS</p>
-              <p className="text-base font-semibold text-white">{school.turnos}</p>
-            </div>
-          </div>
-        )}
-
-        {/* 📌 Shared Predio Alert */}
-        {hasSharedPredio && (
-          <div className="p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg">
-            <div className="flex items-start gap-2">
-              <Share2 className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-gray-400 uppercase tracking-wide mb-1">PREDIO COMPARTIDO</p>
-                <p className="text-sm font-medium text-amber-300 mb-2">
-                  Comparte predio con {school.sharedPredioSchools!.length} establecimiento
-                  {school.sharedPredioSchools!.length !== 1 ? "s" : ""}
-                </p>
-                <div className="space-y-1">
-                  {school.sharedPredioSchools!.map((sharedSchool) => (
-                    <div key={sharedSchool.id} className="flex items-start">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 mr-2 flex-shrink-0"></span>
-                      <div>
-                        <p className="text-sm font-medium text-gray-200">{sharedSchool.nombre}</p>
-                        <p className="text-xs text-gray-400">CUE: {sharedSchool.cue}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 👤 FED in charge */}
-        <div className="flex items-start gap-2">
-          <User className="w-4 h-4 text-[#417099] mt-0.5 flex-shrink-0" />
+        <div className="relative z-10 p-8 space-y-6 flex-1">
+          {/* 🏫 Enhanced School Name with glow effect */}
           <div>
-            <p className="text-sm text-gray-400 uppercase tracking-wide">FED A CARGO</p>
-            {hasFED ? (
-              <p className="text-base font-semibold text-white">{school.fed_a_cargo}</p>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
-                <p className="text-base font-semibold text-red-300">Sin FED a cargo</p>
+            <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#e81f76] group-hover:to-[#00AEC3] transition-all duration-300 leading-tight">
+              {school.nombre}
+            </h3>
+          </div>
+
+          {/* 🔢 Enhanced CUE and Predio with icon animations */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#417099]/20 border border-[#417099]/40 glass-enhanced">
+              <Hash className="w-4 h-4 text-[#00AEC3] group-hover:scale-110 transition-transform duration-300" />
+              <span className="text-sm font-semibold text-[#00AEC3]">CUE: {school.cue}</span>
+            </div>
+            {school.predio && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00AEC3]/20 border border-[#00AEC3]/40 glass-enhanced">
+                <Building className="w-4 h-4 text-[#00AEC3] group-hover:scale-110 transition-transform duration-300" />
+                <span className="text-sm font-semibold text-[#00AEC3]">Predio: {school.predio}</span>
+              </div>
+            )}
+
+            {/* Enhanced badges with glow effects */}
+            {isContextoEncierro && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500 text-white border-2 border-yellow-400 shadow-lg glow-yellow">
+                <AlertTriangle className="w-4 h-4 animate-pulse" />
+                <span className="text-sm font-semibold">Contexto de encierro</span>
+              </div>
+            )}
+
+            {isEscuelaCerrada && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white border-2 border-red-400 shadow-lg glow-rosa">
+                <X className="w-4 h-4 animate-pulse" />
+                <span className="text-sm font-semibold">Escuela cerrada</span>
               </div>
             )}
           </div>
-        </div>
 
-        {/* 📞 Contact */}
-        {school.contacto && (
-          <div className="flex items-start gap-2">
-            <Phone className="w-4 h-4 text-[#e81f76] mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-400 uppercase tracking-wide">
-                {school.contacto.cargo || "CONTACTO PRINCIPAL"}
-              </p>
-              <p className="text-base font-semibold text-white">
-                {school.contacto.nombre} {school.contacto.apellido}
-              </p>
-              {school.contacto.telefono && <p className="text-sm text-gray-300 mt-0.5">{school.contacto.telefono}</p>}
+          {/* Enhanced data sections with icon animations */}
+          <div className="space-y-5">
+            {/* 📍 Address, Location and District */}
+            {school.direccion && (
+              <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+                <Home className="w-5 h-5 text-[#00AEC3] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#e81f76] transition-all duration-300" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">DIRECCIÓN</p>
+                  <p className="text-base font-semibold text-white group-hover/item:text-[#00AEC3] transition-colors duration-300">
+                    {school.direccion}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {location && (
+              <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+                <MapPin className="w-5 h-5 text-[#00AEC3] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#e81f76] transition-all duration-300" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">LOCALIDAD</p>
+                  <p className="text-base font-semibold text-white group-hover/item:text-[#00AEC3] transition-colors duration-300">
+                    {location}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* 🎓 Level + Modality */}
+            {(school.nivel || school.modalidad) && (
+              <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+                <GraduationCap className="w-5 h-5 text-[#417099] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#00AEC3] transition-all duration-300" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">NIVEL Y MODALIDAD</p>
+                  <p className="text-base font-semibold text-white group-hover/item:text-[#417099] transition-colors duration-300">
+                    {school.nivel && school.modalidad
+                      ? `${school.nivel} • ${school.modalidad}`
+                      : school.nivel || school.modalidad}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* 👥 Enhanced enrollment section */}
+            {(school.matricula || school.secciones) && (
+              <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+                <Users className="w-5 h-5 text-[#e81f76] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#00AEC3] transition-all duration-300" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">
+                    MATRÍCULA Y SECCIONES
+                  </p>
+                  <p className="text-base font-semibold text-white group-hover/item:text-[#e81f76] transition-colors duration-300">
+                    {school.matricula && school.secciones
+                      ? `${school.matricula} estudiantes – ${school.secciones} secciones`
+                      : school.matricula
+                        ? `${school.matricula} estudiantes`
+                        : `${school.secciones} secciones`}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ♂ Boys / ♀ Girls with enhanced styling */}
+            {(school.varones || school.mujeres) && (
+              <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+                <Users className="w-5 h-5 text-[#00AEC3] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#e81f76] transition-all duration-300" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">
+                    DISTRIBUCIÓN POR GÉNERO
+                  </p>
+                  <div className="flex items-center gap-4">
+                    {school.varones && (
+                      <span className="text-base font-semibold text-blue-400 group-hover/item:text-blue-300 transition-colors duration-300">
+                        ♂ {school.varones}
+                      </span>
+                    )}
+                    {school.mujeres && (
+                      <span className="text-base font-semibold text-pink-400 group-hover/item:text-pink-300 transition-colors duration-300">
+                        ♀ {school.mujeres}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ⏰ Shifts */}
+            {school.turnos && (
+              <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+                <Clock className="w-5 h-5 text-[#417099] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#00AEC3] transition-all duration-300" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">TURNOS</p>
+                  <p className="text-base font-semibold text-white group-hover/item:text-[#417099] transition-colors duration-300">
+                    {school.turnos}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Enhanced Shared Predio Alert */}
+          {hasSharedPredio && (
+            <div className="p-5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-2 border-amber-500/40 rounded-2xl glass-enhanced glow-yellow">
+              <div className="flex items-start gap-3">
+                <Share2 className="w-6 h-6 text-amber-400 mt-1 flex-shrink-0 animate-pulse-glow" />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2">PREDIO COMPARTIDO</p>
+                  <p className="text-sm font-semibold text-amber-300 mb-3">
+                    Comparte predio con {school.sharedPredioSchools!.length} establecimiento
+                    {school.sharedPredioSchools!.length !== 1 ? "s" : ""}
+                  </p>
+                  <div className="space-y-2">
+                    {school.sharedPredioSchools!.map((sharedSchool) => (
+                      <div key={sharedSchool.id} className="flex items-start">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 mt-2 mr-3 flex-shrink-0 animate-pulse"></span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-200 hover:text-amber-200 transition-colors">
+                            {sharedSchool.nombre}
+                          </p>
+                          <p className="text-xs text-gray-400">CUE: {sharedSchool.cue}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Educational Programs */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-[#e81f76]" />
-            <p className="text-sm text-gray-400 uppercase tracking-wide">PROGRAMAS EDUCATIVOS</p>
-          </div>
-          {hasPrograms ? (
-            <div className="flex flex-wrap gap-1.5">
-              {school.programas_educativos!.slice(0, 3).map((programa, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[#e81f76]/20 text-[#e81f76] border border-[#e81f76]/30"
-                >
-                  {programa.programa}
-                </span>
-              ))}
-              {school.programas_educativos!.length > 3 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-700/50 text-gray-300 border border-gray-600">
-                  +{school.programas_educativos!.length - 3} más
-                </span>
+          {/* Enhanced FED section */}
+          <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+            <User className="w-5 h-5 text-[#417099] mt-1 flex-shrink-0 group-hover/item:scale-110 transition-transform duration-300" />
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">FED A CARGO</p>
+              {hasFED ? (
+                <p className="text-base font-semibold text-white group-hover/item:text-[#417099] transition-colors duration-300">
+                  {school.fed_a_cargo}
+                </p>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-400 animate-pulse" />
+                  <p className="text-base font-semibold text-red-300">Sin FED a cargo</p>
+                </div>
               )}
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic">Sin programas registrados</p>
+          </div>
+
+          {/* Enhanced Contact */}
+          {school.contacto && (
+            <div className="flex items-start gap-3 group/item hover:bg-white/5 rounded-xl p-3 -m-3 transition-all duration-300">
+              <Phone className="w-5 h-5 text-[#e81f76] mt-1 flex-shrink-0 group-hover/item:scale-110 group-hover/item:text-[#00AEC3] transition-all duration-300" />
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">
+                  {school.contacto.cargo || "CONTACTO PRINCIPAL"}
+                </p>
+                <p className="text-base font-semibold text-white group-hover/item:text-[#e81f76] transition-colors duration-300">
+                  {school.contacto.nombre} {school.contacto.apellido}
+                </p>
+                {school.contacto.telefono && (
+                  <p className="text-sm text-gray-300 mt-1 group-hover/item:text-gray-200 transition-colors duration-300">
+                    {school.contacto.telefono}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
+
+          {/* Enhanced Educational Programs */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Award className="w-5 h-5 text-[#e81f76] group-hover:scale-110 transition-transform duration-300" />
+              <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">PROGRAMAS EDUCATIVOS</p>
+            </div>
+            {hasPrograms ? (
+              <div className="flex flex-wrap gap-2">
+                {school.programas_educativos!.slice(0, 3).map((programa, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-[#e81f76]/20 text-[#e81f76] border border-[#e81f76]/40 hover:bg-[#e81f76]/30 transition-all duration-300 glass-enhanced"
+                  >
+                    {programa.programa}
+                  </span>
+                ))}
+                {school.programas_educativos!.length > 3 && (
+                  <span className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-gray-700/60 text-gray-300 border border-gray-600/50 glass-enhanced">
+                    +{school.programas_educativos!.length - 3} más
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">Sin programas registrados</p>
+            )}
+          </div>
+
+          {/* Enhanced Institutional Tag */}
+          <div className="pt-4">
+            <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-gray-800/60 to-gray-700/60 text-gray-300 border border-gray-600/50 glass-enhanced">
+              <span className="w-2 h-2 bg-gradient-to-r from-[#e81f76] to-[#00AEC3] rounded-full mr-2 animate-pulse"></span>
+              DGCyE • Provincia de Buenos Aires
+            </span>
+          </div>
         </div>
 
-        {/* 🏷️ Institutional Tag */}
-        <div className="pt-2">
-          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-800/50 text-gray-300 border border-gray-600">
-            DGCyE • Provincia de Buenos Aires
-          </span>
-        </div>
+        {/* Enhanced View Details Button */}
+        <button
+          onClick={onViewDetails}
+          className="w-full py-6 px-8 bg-gradient-to-r from-[#417099] to-[#00AEC3] text-white font-bold text-lg hover:from-[#365d80] hover:to-[#00a0b8] transition-all duration-300 flex items-center justify-center gap-3 group/btn relative overflow-hidden holographic-sheen"
+          aria-label={`Ver detalles de ${school.nombre}`}
+        >
+          <span>Ver detalles completos</span>
+          <ArrowRight className="w-6 h-6 transition-all duration-300 group-hover/btn:translate-x-2 group-hover/btn:scale-110" />
+
+          {/* Animated shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700" />
+        </button>
       </div>
-
-      {/* View Details Button */}
-      <button
-        onClick={onViewDetails}
-        className="w-full py-4 px-6 bg-gradient-to-r from-[#417099] to-[#00AEC3] text-white font-semibold hover:from-[#365d80] hover:to-[#00a0b8] transition-all duration-200 flex items-center justify-center gap-2 group-hover:shadow-lg"
-        aria-label={`Ver detalles de ${school.nombre}`}
-      >
-        <span>Ver detalles completos</span>
-        <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-      </button>
     </div>
   )
 }

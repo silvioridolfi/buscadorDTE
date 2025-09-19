@@ -38,15 +38,20 @@ export default function SchoolFinder() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-          Buscador de <span className="text-[#00AEC3]">Escuelas</span>
+      {/* Enhanced Header with scanline effect */}
+      <div className="text-center mb-16 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00AEC3]/10 to-transparent animate-scanline pointer-events-none"></div>
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight relative z-10">
+          Buscador de{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e81f76] to-[#00AEC3] animate-pulse-glow">
+            Escuelas
+          </span>
         </h1>
-        <p className="text-lg text-gray-300">Región 1</p>
+        <p className="text-xl md:text-2xl text-gray-300 font-medium">Región 1 • Provincia de Buenos Aires</p>
+        <div className="mt-4 h-1 w-32 mx-auto bg-gradient-to-r from-[#e81f76] to-[#00AEC3] rounded-full opacity-60"></div>
       </div>
 
-      {/* Search Input */}
+      {/* Enhanced Search Input */}
       <SearchInput onSearch={searchSchools} onClear={resetSearch} loading={loading} hasResults={schools.length > 0} />
 
       {/* Mobile Layout: Results first, then Stats */}
@@ -72,10 +77,13 @@ export default function SchoolFinder() {
           )}
 
           {hasSearched && hasResults && !loading && (
-            <div className="mt-12 pt-8 border-t border-gray-700/50">
-              <div className="text-center mb-8">
-                <h3 className="text-xl font-semibold text-gray-300 mb-2">Estadísticas de la Región</h3>
-                <p className="text-sm text-gray-400">Información general de establecimientos educativos</p>
+            <div className="mt-16 pt-12 border-t border-gray-700/50 relative">
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#e81f76] to-[#00AEC3] rounded-full opacity-60"></div>
+              </div>
+              <div className="text-center mb-12">
+                <h3 className="text-2xl font-semibold text-gray-300 mb-4">Estadísticas de la Región</h3>
+                <p className="text-gray-400">Información general de establecimientos educativos</p>
               </div>
               <StatsOverview />
             </div>
