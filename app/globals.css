@@ -74,8 +74,9 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+/* Added --font-sans definition to @theme for Encode Sans global usage */
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --font-sans: var(--font-encode-sans), system-ui, -apple-system, sans-serif;
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -97,7 +98,7 @@
   --color-ring: hsl(var(--ring));
   --color-ba-rosa: #e81f76;
   --color-ba-azul: #417099;
-  --color-ba-celeste: #00AEC3;
+  --color-ba-celeste: #00aec3;
   --radius: var(--radius);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
