@@ -6,22 +6,15 @@ import { ChevronUp } from "lucide-react"
 export default function BackToTopButton() {
   const [isVisible, setIsVisible] = useState(false)
 
-  // Show button when page is scrolled down
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
-        setIsVisible(true)
-      } else {
-        setIsVisible(false)
-      }
+      setIsVisible(window.scrollY > 300)
     }
 
     window.addEventListener("scroll", toggleVisibility)
-
     return () => window.removeEventListener("scroll", toggleVisibility)
   }, [])
 
-  // Scroll to top smoothly
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -29,9 +22,7 @@ export default function BackToTopButton() {
     })
   }
 
-  if (!isVisible) {
-    return null
-  }
+  if (!isVisible) return null
 
   return (
     <button
