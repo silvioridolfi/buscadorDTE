@@ -21,7 +21,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
   const [hasSearched, setHasSearched] = useState(false)
   const [totalResults, setTotalResults] = useState(0)
 
-  // Normalize text: remove accents and lowercase
   const normalizeText = useCallback((text: string): string => {
     return text
       .normalize("NFD")
@@ -29,33 +28,16 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
       .toLowerCase()
   }, [])
 
-  // Extract school type and number: "tecnica 1", "técnica n° 1", "secundaria nº5", etc.
   const extractSchoolPattern = useCallback(
     (searchTerm: string): { type: string; number: string } | null => {
       const term = normalizeText(searchTerm.trim())
 
       const schoolTypes = [
-        "primaria",
-        "secundaria",
-        "jardin",
-        "escuela",
-        "colegio",
-        "instituto",
-        "tecnica",
-        "media",
-        "especial",
-        "adultos",
-        "bachillerato",
-        "comercial",
-        "industrial",
-        "normal",
-        "agropecuaria",
-        "agrotecnica",
-        "estetica",
-        "artistica",
-        "musical",
-        "rural",
-        "urbana",
+        "primaria", "secundaria", "jardin", "escuela", "colegio",
+        "instituto", "tecnica", "media", "especial", "adultos",
+        "bachillerato", "comercial", "industrial", "normal",
+        "agropecuaria", "agrotecnica", "estetica", "artistica",
+        "musical", "rural", "urbana",
       ]
 
       for (const type of schoolTypes) {
@@ -75,7 +57,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
           }
         }
 
-        // Only the type without number (e.g., "tecnica")
         if (term === type) {
           return { type, number: "" }
         }
@@ -86,17 +67,14 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
     [normalizeText],
   )
 
-  // Exact match checker: respects type and exact number boundaries
   const isExactSchoolMatch = useCallback(
     (schoolName: string, searchType: string, searchNumber: string): boolean => {
       const name = normalizeText(schoolName)
       const type = normalizeText(searchType)
       const number = searchNumber
 
-      // Must contain the type
       if (!name.includes(type)) return false
 
-      // Patterns that match exact number, not 10, 11, 12...
       const exactNumberPatterns = [
         new RegExp(`\\b${type}\\s+${number}\\b`, "i"),
         new RegExp(`\\b${type}\\s+n°\\s*${number}\\b`, "i"),
@@ -109,14 +87,12 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
       const hasExactPattern = exactNumberPatterns.some((p) => p.test(name))
       if (!hasExactPattern) return false
 
-      // Extra guard: numbers as whole words
       const numbersInName = name.match(/\b\d+\b/g) || []
       return numbersInName.includes(number)
     },
     [normalizeText],
   )
 
-  // Generate accent variations for common Spanish words (bidirectional)
   const generateAccentVariations = useCallback(
     (term: string): string[] => {
       const variations = new Set<string>()
@@ -129,7 +105,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
       variations.add(normalized)
       variations.add(normalized.toUpperCase())
 
-      // Common words where accents are frequent
       const commonWords: Record<string, string[]> = {
         tecnica: ["tecnica", "técnica"],
         estetica: ["estetica", "estética"],
@@ -160,45 +135,54 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
     [normalizeText],
   )
 
-  // Process school results with additional data
+  // FIX: de N+1 queries a 3 queries totales
   const processSchoolResults = useCallback(async (schools: any[]): Promise<School[]> => {
+    if (schools.length === 0) return []
+
     try {
       const results = schools.map((school) => ({
         ...school,
         contacto: school.contactos?.[0] || null,
-        programas_educativos: [],
+        programas_educativos: [] as { programa: string }[],
         sharedPredioSchools: [] as { id: string; nombre: string; cue: number }[],
       }))
 
-      // Fetch educational programs for each school
-      for (let i = 0; i < results.length; i++) {
-        const school = results[i]
-        try {
-          const { data: programas } = await supabase.from("programas_x_cue").select("programa").eq("cue", school.cue)
-          results[i].programas_educativos = programas || []
-        } catch (error) {
-          console.error(`Error querying programs for CUE ${school.cue}:`, error)
+      // UNA sola query para todos los programas
+      const cues = results.map((s) => s.cue)
+      const { data: todosProgramas } = await supabase
+        .from("programas_x_cue")
+        .select("cue, programa")
+        .in("cue", cues)
+
+      const programasByCue = new Map<number, { programa: string }[]>()
+      for (const p of todosProgramas || []) {
+        if (!programasByCue.has(p.cue)) programasByCue.set(p.cue, [])
+        programasByCue.get(p.cue)!.push({ programa: p.programa })
+      }
+
+      // UNA sola query para todos los predios compartidos
+      const predios = results.map((s) => s.predio).filter(Boolean)
+      const ids = results.map((s) => s.id)
+
+      const sharedByPredioCue = new Map<number, { id: string; nombre: string; cue: number }[]>()
+
+      if (predios.length > 0) {
+        const { data: todasShared } = await supabase
+          .from("establecimientos")
+          .select("id, nombre, cue, predio")
+          .in("predio", predios)
+          .not("id", "in", `(${ids.join(",")})`)
+
+        for (const s of todasShared || []) {
+          if (!sharedByPredioCue.has(s.predio)) sharedByPredioCue.set(s.predio, [])
+          sharedByPredioCue.get(s.predio)!.push({ id: s.id, nombre: s.nombre, cue: s.cue })
         }
       }
 
-      // Find schools with shared predios
+      // Asignar todo de una vez
       for (let i = 0; i < results.length; i++) {
-        const school = results[i]
-        if (!school.predio) continue
-
-        try {
-          const { data: sharedSchools } = await supabase
-            .from("establecimientos")
-            .select("id, nombre, cue")
-            .eq("predio", school.predio)
-            .neq("id", school.id)
-
-          if (sharedSchools && sharedSchools.length > 0) {
-            results[i].sharedPredioSchools = sharedSchools
-          }
-        } catch (error) {
-          console.error("Error finding shared predios for school", school.id, error)
-        }
+        results[i].programas_educativos = programasByCue.get(results[i].cue) || []
+        results[i].sharedPredioSchools = sharedByPredioCue.get(results[i].predio) || []
       }
 
       return results
@@ -216,84 +200,38 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
         return
       }
 
-      console.log("🔍 Starting search for:", cleanTerm)
       setLoading(true)
       setError(null)
       setHasSearched(true)
 
       try {
-        // Base query with all necessary fields
         const baseQuery = supabase
           .from("establecimientos")
           .select(`
-          id,
-          cue,
-          predio,
-          nombre,
-          distrito,
-          ciudad,
-          direccion,
-          tipo_establecimiento,
-          ambito,
-          nivel,
-          modalidad,
-          matricula,
-          varones,
-          mujeres,
-          secciones,
-          turnos,
-          fed_a_cargo,
-          lat,
-          lon,
-          tipo,
-          cue_anterior,
-          access_id,
-          listado_conexion_internet,
-          plan_enlace,
-          subplan_enlace,
-          recurso_primario,
-          fecha_inicio_conectividad,
-          reclamos_grupo_1_ani,
-          proveedor_asignado_pba,
-          observaciones,
-          proveedor_internet_pnce,
-          fecha_instalacion_pnce,
-          pnce_tipo_mejora,
-          pnce_fecha_mejora,
-          pnce_estado,
-          mb,
-          pba_2019_proveedor_internet,
-          pba_2019_fecha_instalacion,
-          pba_2019_estado,
-          pba_grupo_1_proveedor_internet,
-          pba_grupo_1_fecha_instalacion,
-          pba_grupo_1_estado,
-          pba_grupo_2_a_proveedor_internet,
-          pba_grupo_2_a_fecha_instalacion,
-          pba_grupo_2_a_tipo_mejora,
-          pba_grupo_2_a_fecha_mejora,
-          pba_grupo_2_a_estado,
-          estado_instalacion_pba,
-          plan_piso_tecnologico,
-          tipo_piso_instalado,
-          proveedor_piso_tecnologico_cue,
-          fecha_terminado_piso_tecnologico_cue,
-          tipo_mejora,
-          fecha_mejora,
-          contactos!left(
-            id,
-            nombre,
-            apellido,
-            cargo,
-            telefono,
-            correo
-          )
-        `)
-          .limit(200) // a bit higher to allow post-filtering for exact matches
+            id, cue, predio, nombre, distrito, ciudad, direccion,
+            tipo_establecimiento, ambito, nivel, modalidad, matricula,
+            varones, mujeres, secciones, turnos, fed_a_cargo, lat, lon,
+            tipo, cue_anterior, access_id, listado_conexion_internet,
+            plan_enlace, subplan_enlace, recurso_primario,
+            fecha_inicio_conectividad, reclamos_grupo_1_ani,
+            proveedor_asignado_pba, observaciones,
+            proveedor_internet_pnce, fecha_instalacion_pnce,
+            pnce_tipo_mejora, pnce_fecha_mejora, pnce_estado, mb,
+            pba_2019_proveedor_internet, pba_2019_fecha_instalacion,
+            pba_2019_estado, pba_grupo_1_proveedor_internet,
+            pba_grupo_1_fecha_instalacion, pba_grupo_1_estado,
+            pba_grupo_2_a_proveedor_internet, pba_grupo_2_a_fecha_instalacion,
+            pba_grupo_2_a_tipo_mejora, pba_grupo_2_a_fecha_mejora,
+            pba_grupo_2_a_estado, estado_instalacion_pba,
+            plan_piso_tecnologico, tipo_piso_instalado,
+            proveedor_piso_tecnologico_cue, fecha_terminado_piso_tecnologico_cue,
+            tipo_mejora, fecha_mejora,
+            contactos!left(id, nombre, apellido, cargo, telefono, correo)
+          `)
+          .limit(200)
 
         let results: any[] = []
 
-        // 1) Numeric-only logic
         if (/^\d+$/.test(cleanTerm)) {
           if (/^\d{8}$/.test(cleanTerm)) {
             const { data } = await baseQuery.eq("cue", Number.parseInt(cleanTerm))
@@ -302,7 +240,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
             const { data } = await baseQuery.eq("predio", Number.parseInt(cleanTerm))
             results = data || []
           } else if (/^\d{1,3}$/.test(cleanTerm)) {
-            // exact number in names (avoid matching 1 in 10)
             const { data } = await baseQuery.ilike("nombre", `%${cleanTerm}%`)
             const exact = (data || []).filter((s) => {
               const nums = (s.nombre as string).match(/\b\d+\b/g) || []
@@ -311,34 +248,25 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
             results = exact.length > 0 ? exact : data || []
           }
         } else {
-          // 2) Pattern-based search: e.g. "tecnica 1", "técnica n° 1"
           const pattern = extractSchoolPattern(cleanTerm)
           if (pattern) {
             const { type, number } = pattern
 
             if (number) {
-              // When a number is present, we must enforce exact-match with the number
-              // Fetch by number first, then filter strictly with type+number
-              // We also consider accent variants of type
               const typeVariants = generateAccentVariations(type)
-
-              // Initial fetch by the number to reduce dataset
               const { data: byNumber } = await baseQuery.ilike("nombre", `%${number}%`).order("nombre")
               const filtered =
                 byNumber?.filter((school) =>
                   typeVariants.some((tv) => isExactSchoolMatch(school.nombre, tv, number)),
                 ) || []
-
               results = filtered
             } else {
-              // Only type, no number -> broad search by type with accent variations
               const typeVariants = generateAccentVariations(type)
               const orConditions = typeVariants.map((tv) => `nombre.ilike.%${tv}%`).join(",")
               const { data: typeMatches } = await baseQuery.or(orConditions).order("nombre")
               results = typeMatches || []
             }
           } else {
-            // 3) Enhanced text search with accent variations (no strict number)
             const variations = generateAccentVariations(cleanTerm)
             const orConditions = variations.map((v) => `nombre.ilike.%${v}%`).join(",")
             const { data: orResults, error: orError } = await baseQuery.or(orConditions).order("nombre")
@@ -346,19 +274,16 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
             if (!orError && orResults && orResults.length > 0) {
               results = orResults
             } else {
-              // Fallback to simple ILIKE
               const { data: fallback } = await baseQuery.ilike("nombre", `%${cleanTerm}%`).order("nombre")
               results = fallback || []
             }
           }
         }
 
-        // Deduplicate by CUE
         const uniqueResults = results.filter(
           (school, index, self) => index === self.findIndex((s) => s.cue === school.cue),
         )
 
-        // Sort by relevance
         const searchNormalized = normalizeText(cleanTerm)
         const sorted = uniqueResults.sort((a, b) => {
           const aName = normalizeText(a.nombre)
@@ -376,7 +301,7 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
         setSchools(processedResults)
         setTotalResults(processedResults.length)
       } catch (err) {
-        console.error("❌ Search error:", err)
+        console.error("Search error:", err)
         setError(err instanceof Error ? err.message : "Error al realizar la búsqueda")
         setSchools([])
         setTotalResults(0)
