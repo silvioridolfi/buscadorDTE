@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 interface KeyValueProps {
   label: string
   value: string | number | null | undefined
-  icon?: React.ReactNode
+  icon?: React.ReactElement<{ className?: string }>
   className?: string
   fallback?: string
 }
@@ -19,7 +19,7 @@ export function KeyValue({ label, value, icon, className, fallback = "—" }: Ke
     <div className={cn("flex items-start gap-3", className)}>
       {icon && (
         <div className="w-5 h-5 mt-0.5 flex-shrink-0 text-[#00AEC3]">
-          {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
+          {React.cloneElement(icon, { className: "w-5 h-5" })}
         </div>
       )}
       <div className="flex-1 min-w-0">
