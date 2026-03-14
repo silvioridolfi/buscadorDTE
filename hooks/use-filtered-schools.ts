@@ -87,7 +87,7 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
       const hasExactPattern = exactNumberPatterns.some((p) => p.test(name))
       if (!hasExactPattern) return false
 
-      const numbersInName = name.match(/\b\d+\b/g) || []
+      const numbersInName: string[] = name.match(/\b\d+\b/g) || []
       return numbersInName.includes(number)
     },
     [normalizeText],
@@ -135,7 +135,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
     [normalizeText],
   )
 
-  // FIX: de N+1 queries a 3 queries totales
   const processSchoolResults = useCallback(async (schools: any[]): Promise<School[]> => {
     if (schools.length === 0) return []
 
@@ -147,7 +146,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
         sharedPredioSchools: [] as { id: string; nombre: string; cue: number }[],
       }))
 
-      // UNA sola query para todos los programas
       const cues = results.map((s) => s.cue)
       const { data: todosProgramas } = await supabase
         .from("programas_x_cue")
@@ -160,7 +158,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
         programasByCue.get(p.cue)!.push({ programa: p.programa })
       }
 
-      // UNA sola query para todos los predios compartidos
       const predios = results.map((s) => s.predio).filter(Boolean)
       const ids = results.map((s) => s.id)
 
@@ -179,7 +176,6 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
         }
       }
 
-      // Asignar todo de una vez
       for (let i = 0; i < results.length; i++) {
         results[i].programas_educativos = programasByCue.get(results[i].cue) || []
         results[i].sharedPredioSchools = sharedByPredioCue.get(results[i].predio) || []
@@ -242,7 +238,7 @@ export function useFilteredSchools(): UseFilteredSchoolsReturn {
           } else if (/^\d{1,3}$/.test(cleanTerm)) {
             const { data } = await baseQuery.ilike("nombre", `%${cleanTerm}%`)
             const exact = (data || []).filter((s) => {
-              const nums = (s.nombre as string).match(/\b\d+\b/g) || []
+              const nums: string[] = (s.nombre as string).match(/\b\d+\b/g) || []
               return nums.includes(cleanTerm)
             })
             results = exact.length > 0 ? exact : data || []
