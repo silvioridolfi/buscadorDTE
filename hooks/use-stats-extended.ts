@@ -7,6 +7,7 @@ interface FEDStats {
   fed_a_cargo: string
   count: number
 }
+
 interface ExtendedStatsData {
   totalEstablishments: number | null
   totalDistricts: number | null
@@ -15,6 +16,7 @@ interface ExtendedStatsData {
   districtStats: { distrito: string; count: number }[]
   fedStats: FEDStats[]
 }
+
 interface UseStatsExtendedReturn {
   stats: ExtendedStatsData
   loading: boolean
@@ -39,63 +41,27 @@ export function useStatsExtended(): UseStatsExtendedReturn {
         setLoading(true)
         setError(null)
 
-        // Single consolidated query to ensure values are always available
-        const { data: establishments, error: establishmentsError } = await supabase
-          .from("establecimientos")
-          .select("id, distrito, fed_a_cargo, matricula, varones, mujeres")
+        // Una sola llamada a la función SQL en lugar de traer todas las filas
+        const { data, error: rpcError } = await supabase.rpc("get_stats")
 
-        if (establishmentsError) {
-          throw new Error(establishmentsError.message)
-        }
+        if (rpcError) throw new Error(rpcError.message)
+        if (!data) throw new Error("No se pudieron cargar las estadísticas")
 
-        const totalEstablishments = establishments?.length || 0
-
-        // Districts
-        const districtMap = new Map<string, number>()
-        establishments?.forEach((e) => {
-          const d = (e.distrito || "").trim()
-          if (!d) return
-          districtMap.set(d, (districtMap.get(d) || 0) + 1)
-        })
-        const districtStats = Array.from(districtMap.entries())
-          .map(([distrito, count]) => ({ distrito, count }))
-          .sort((a, b) => b.count - a.count)
-        const totalDistricts = districtStats.length
-
-        // FEDs
-        const fedMap = new Map<string, number>()
-        establishments?.forEach((e) => {
-          const fed = (e.fed_a_cargo || "Sin FED asignado").trim()
-          fedMap.set(fed, (fedMap.get(fed) || 0) + 1)
-        })
-        const fedStats = Array.from(fedMap.entries())
-          .map(([fed_a_cargo, count]) => ({ fed_a_cargo, count }))
-          .sort((a, b) => b.count - a.count)
-
-        // Enrollment totals
-        let totalVarones = 0
-        let totalMujeres = 0
-        let totalMatricula = 0
-
-        establishments?.forEach((e) => {
-          if (typeof e.matricula === "number" && e.matricula > 0) totalMatricula += e.matricula
-          if (typeof e.varones === "number" && e.varones >= 0) totalVarones += e.varones
-          if (typeof e.mujeres === "number" && e.mujeres >= 0) totalMujeres += e.mujeres
-        })
-
-        const genderTotal = totalVarones + totalMujeres
-        const totalEnrollment = genderTotal > 0 ? genderTotal : totalMatricula
+        const varones = Number(data.totalVarones) || 0
+        const mujeres = Number(data.totalMujeres) || 0
+        const totalMatricula = Number(data.totalMatricula) || 0
+        const totalEnrollment = varones + mujeres > 0 ? varones + mujeres : totalMatricula
 
         setStats({
-          totalEstablishments,
-          totalDistricts,
+          totalEstablishments: Number(data.totalEstablecimientos) || 0,
+          totalDistricts: Number(data.totalDistritos) || 0,
           totalEnrollment,
-          enrollmentByGender: { varones: totalVarones, mujeres: totalMujeres, total: totalEnrollment },
-          districtStats,
-          fedStats,
+          enrollmentByGender: { varones, mujeres, total: totalEnrollment },
+          districtStats: data.porDistrito || [],
+          fedStats: data.porFed || [],
         })
       } catch (err) {
-        console.error("Extended stats fetch error:", err)
+        console.error("Stats fetch error:", err)
         setError("Error al cargar estadísticas")
         setStats({
           totalEstablishments: null,
