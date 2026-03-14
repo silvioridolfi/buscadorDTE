@@ -1,22 +1,11 @@
 "use client"
 
 import {
-  MapPin,
-  Phone,
-  User,
-  Building,
-  ArrowRight,
-  Share2,
-  Users,
-  GraduationCap,
-  Clock,
-  Award,
-  AlertTriangle,
-  Hash,
-  Home,
-  X,
+  MapPin, Phone, User, Building, ArrowRight, Share2, Users,
+  GraduationCap, Clock, Award, AlertTriangle, Hash, Home, X,
 } from "lucide-react"
 import type { School } from "@/lib/types"
+import { isContextoEncierro, isEscuelaCerrada } from "@/lib/utils"
 
 interface SchoolCardOptimizedProps {
   school: School
@@ -27,43 +16,30 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
   const hasSharedPredio = school.sharedPredioSchools && school.sharedPredioSchools.length > 0
   const hasPrograms = school.programas_educativos && school.programas_educativos.length > 0
 
-  // Helper function to format location (avoid repetition)
   const formatLocation = () => {
     const ciudad = school.ciudad?.trim()
     const distrito = school.distrito?.trim()
-
     if (!ciudad && !distrito) return null
     if (!ciudad) return distrito
     if (!distrito) return ciudad
-
-    // If city and district are the same (case insensitive), show only one
-    if (ciudad.toLowerCase() === distrito.toLowerCase()) {
-      return ciudad
-    }
-
-    // If different, show: City (District)
+    if (ciudad.toLowerCase() === distrito.toLowerCase()) return ciudad
     return `${ciudad} (${distrito})`
   }
 
   const location = formatLocation()
   const hasFED = school.fed_a_cargo && school.fed_a_cargo !== "Sin FED a cargo"
-
-  // Detectar badges especiales ÚNICAMENTE basados en plan_enlace
-  const planEnlace = school.plan_enlace?.toUpperCase() || ""
-  const isContextoEncierro = planEnlace.includes("CONTEXTO DE ENCIERRO")
-  const isEscuelaCerrada = planEnlace.includes("ESCUELA CERRADA")
+  const contextEncierro = isContextoEncierro(school.plan_enlace)
+  const escuelaCerrada = isEscuelaCerrada(school.plan_enlace)
 
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group border border-gray-700 h-full flex flex-col hover:scale-[1.02]">
       <div className="p-6 space-y-4 flex-1">
-        {/* 🏫 School Name */}
         <div>
           <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#00AEC3] transition-colors duration-200 leading-tight">
             {school.nombre}
           </h3>
         </div>
 
-        {/* 🔢 CUE and Predio */}
         <div className="flex flex-wrap gap-2 mb-4">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#417099]/20 border border-[#417099]/30">
             <Hash className="w-3.5 h-3.5 text-[#00AEC3]" />
@@ -75,17 +51,13 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
               <span className="text-xs font-medium text-[#00AEC3]">Predio: {school.predio}</span>
             </div>
           )}
-
-          {/* Badge amarillo para Contexto de encierro - SOLO UNO */}
-          {isContextoEncierro && (
+          {contextEncierro && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500 text-white border border-yellow-600">
               <AlertTriangle className="w-3.5 h-3.5 text-white" />
               <span className="text-xs font-medium text-white">Contexto de encierro</span>
             </div>
           )}
-
-          {/* Badge rojo para Escuela cerrada - SOLO UNO */}
-          {isEscuelaCerrada && (
+          {escuelaCerrada && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 text-white border border-red-600">
               <X className="w-3.5 h-3.5 text-white" />
               <span className="text-xs font-medium text-white">Escuela cerrada</span>
@@ -93,7 +65,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           )}
         </div>
 
-        {/* 📍 Address, Location and District */}
         <div className="space-y-2">
           {school.direccion && (
             <div className="flex items-start gap-2">
@@ -115,7 +86,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           )}
         </div>
 
-        {/* 🎓 Level + Modality */}
         {(school.nivel || school.modalidad) && (
           <div className="flex items-start gap-2">
             <GraduationCap className="w-4 h-4 text-[#417099] mt-0.5 flex-shrink-0" />
@@ -130,7 +100,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         )}
 
-        {/* 👥 Total Enrollment - Sections */}
         {(school.matricula || school.secciones) && (
           <div className="flex items-start gap-2">
             <Users className="w-4 h-4 text-[#e81f76] mt-0.5 flex-shrink-0" />
@@ -147,7 +116,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         )}
 
-        {/* ♂ Boys / ♀ Girls */}
         {(school.varones || school.mujeres) && (
           <div className="flex items-start gap-2">
             <Users className="w-4 h-4 text-[#00AEC3] mt-0.5 flex-shrink-0" />
@@ -164,7 +132,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         )}
 
-        {/* ⏰ Shifts */}
         {school.turnos && (
           <div className="flex items-start gap-2">
             <Clock className="w-4 h-4 text-[#417099] mt-0.5 flex-shrink-0" />
@@ -175,7 +142,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         )}
 
-        {/* 📌 Shared Predio Alert */}
         {hasSharedPredio && (
           <div className="p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg">
             <div className="flex items-start gap-2">
@@ -202,7 +168,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         )}
 
-        {/* 👤 FED in charge */}
         <div className="flex items-start gap-2">
           <User className="w-4 h-4 text-[#417099] mt-0.5 flex-shrink-0" />
           <div>
@@ -218,7 +183,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         </div>
 
-        {/* 📞 Contact */}
         {school.contacto && (
           <div className="flex items-start gap-2">
             <Phone className="w-4 h-4 text-[#e81f76] mt-0.5 flex-shrink-0" />
@@ -229,12 +193,13 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
               <p className="text-base font-semibold text-white">
                 {school.contacto.nombre} {school.contacto.apellido}
               </p>
-              {school.contacto.telefono && <p className="text-sm text-gray-300 mt-0.5">{school.contacto.telefono}</p>}
+              {school.contacto.telefono && (
+                <p className="text-sm text-gray-300 mt-0.5">{school.contacto.telefono}</p>
+              )}
             </div>
           </div>
         )}
 
-        {/* Educational Programs */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Award className="w-4 h-4 text-[#e81f76]" />
@@ -261,7 +226,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           )}
         </div>
 
-        {/* 🏷️ Institutional Tag */}
         <div className="pt-2">
           <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-800/50 text-gray-300 border border-gray-600">
             DGCyE • Provincia de Buenos Aires
@@ -269,7 +233,6 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
         </div>
       </div>
 
-      {/* View Details Button */}
       <button
         onClick={onViewDetails}
         className="w-full py-4 px-6 bg-gradient-to-r from-[#417099] to-[#00AEC3] text-white font-semibold hover:from-[#365d80] hover:to-[#00a0b8] transition-all duration-200 flex items-center justify-center gap-2 group-hover:shadow-lg"
