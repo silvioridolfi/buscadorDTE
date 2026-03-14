@@ -1,13 +1,13 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { KeyValue } from "./key-value"
 
 interface KeyValueItem {
   key: string
   label: string
   value: string | number | null | undefined
-  icon?: React.ReactNode
+  icon?: React.ReactElement<{ className?: string }>
 }
 
 interface KeyValueListProps {
@@ -17,7 +17,6 @@ interface KeyValueListProps {
 }
 
 export function KeyValueList({ items, columns = 2, className }: KeyValueListProps) {
-  // Filter out items with null, undefined, or empty string values
   const filteredItems = items.filter((item) => {
     const value = item.value
     return value !== null && value !== undefined && value !== ""
