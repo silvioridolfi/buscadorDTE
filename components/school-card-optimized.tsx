@@ -1,11 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import {
   MapPin, Phone, User, Building, ArrowRight, Share2, Users,
-  GraduationCap, Clock, Award, AlertTriangle, Hash, Home, X,
+  GraduationCap, Clock, Award, AlertTriangle, Hash, Home, X, Pencil,
 } from "lucide-react"
 import type { School } from "@/lib/types"
+import type { Contact } from "@/lib/types"
 import { isContextoEncierro, isEscuelaCerrada } from "@/lib/utils"
+import { ContactEditModal } from "./contact-edit-modal"
 
 interface SchoolCardOptimizedProps {
   school: School
@@ -13,6 +16,14 @@ interface SchoolCardOptimizedProps {
 }
 
 export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCardOptimizedProps) {
+  const [editingContact, setEditingContact] = useState(false)
+  const [localContact, setLocalContact] = useState<Contact | null | undefined>(school.contacto)
+
+  const handleContactSaved = (updatedContact: Contact) => {
+    setLocalContact(updatedContact)
+    setEditingContact(false)
+  }
+
   const hasSharedPredio = school.sharedPredioSchools && school.sharedPredioSchools.length > 0
   const hasPrograms = school.programas_educativos && school.programas_educativos.length > 0
 
@@ -32,6 +43,7 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
   const escuelaCerrada = isEscuelaCerrada(school.plan_enlace)
 
   return (
+    <>
     <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group border border-gray-700 h-full flex flex-col hover:scale-[1.02]">
       <div className="p-6 space-y-4 flex-1">
         <div>
@@ -183,22 +195,47 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           </div>
         </div>
 
-        {school.contacto && (
-          <div className="flex items-start gap-2">
-            <Phone className="w-4 h-4 text-[#e81f76] mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-400 uppercase tracking-wide">
-                {school.contacto.cargo || "CONTACTO PRINCIPAL"}
-              </p>
-              <p className="text-base font-semibold text-white">
-                {school.contacto.nombre} {school.contacto.apellido}
-              </p>
-              {school.contacto.telefono && (
-                <p className="text-sm text-gray-300 mt-0.5">{school.contacto.telefono}</p>
-              )}
+        {/* Bloque de contacto con botón editar */}
+        <div className="p-3 bg-gray-800/40 border border-gray-700/60 rounded-xl">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start gap-2 flex-1 min-w-0">
+              <Phone className="w-4 h-4 text-[#e81f76] mt-0.5 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-sm text-gray-400 uppercase tracking-wide">
+                  {localContact?.cargo || "CONTACTO PRINCIPAL"}
+                </p>
+                {localContact ? (
+                  <>
+                    <p className="text-base font-semibold text-white truncate">
+                      {localContact.nombre} {localContact.apellido}
+                    </p>
+                    {localContact.telefono && (
+                      <p className="text-sm text-gray-300 mt-0.5">{localContact.telefono}</p>
+                    )}
+                    {localContact.correo && (
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">{localContact.correo}</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">Sin contacto registrado</p>
+                )}
+              </div>
             </div>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setEditingContact(true)
+              }}
+              className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#417099]/20 border border-[#417099]/40 text-[#00AEC3] hover:bg-[#417099]/40 hover:border-[#00AEC3]/60 transition-all duration-200 text-xs font-medium"
+              title={localContact ? "Editar contacto" : "Agregar contacto"}
+              aria-label={localContact ? "Editar datos de contacto" : "Agregar contacto"}
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>{localContact ? "Editar" : "Agregar"}</span>
+            </button>
           </div>
-        )}
+        </div>
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -242,5 +279,16 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
         <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
       </button>
     </div>
+
+      {editingContact && (
+        <ContactEditModal
+          cue={school.cue}
+          schoolName={school.nombre}
+          contact={localContact}
+          onClose={() => setEditingContact(false)}
+          onSaved={handleContactSaved}
+        />
+      )}
+    </>
   )
 }
