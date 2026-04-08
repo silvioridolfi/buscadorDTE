@@ -10,6 +10,7 @@ interface ContactFormData {
   cargo: string
   telefono: string
   correo: string
+  direccion: string
 }
 
 interface UseContactEditReturn {
@@ -36,6 +37,15 @@ export function useContactEdit(): UseContactEditReturn {
       setError(null)
 
       try {
+        // Actualizar dirección en establecimientos (siempre)
+        const { error: direccionError } = await supabase
+          .from("establecimientos")
+          .update({ direccion: data.direccion.trim().toUpperCase() })
+          .eq("cue", cue)
+
+        if (direccionError) throw new Error(`Error al actualizar dirección: ${direccionError.message}`)
+
+        // Contacto: UPDATE o INSERT
         if (existingContactId) {
           const { data: updated, error: updateError } = await supabase
             .from("contactos")
@@ -70,7 +80,7 @@ export function useContactEdit(): UseContactEditReturn {
           return inserted as Contact
         }
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Error al guardar contacto"
+        const msg = err instanceof Error ? err.message : "Error al guardar"
         setError(msg)
         return null
       } finally {

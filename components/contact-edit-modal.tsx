@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, forwardRef } from "react"
-import { X, Save, Loader2, User, Phone, Mail, Briefcase, AlertTriangle } from "lucide-react"
+import { X, Save, Loader2, User, Phone, Mail, Briefcase, AlertTriangle, MapPin } from "lucide-react"
 import type { Contact } from "@/lib/types"
 import { useContactEdit } from "@/hooks/use-contact-edit"
 
@@ -9,8 +9,9 @@ interface ContactEditModalProps {
   cue: number
   schoolName: string
   contact: Contact | null | undefined
+  direccion: string | null | undefined
   onClose: () => void
-  onSaved: (updatedContact: Contact) => void
+  onSaved: (updatedContact: Contact, nuevaDireccion: string) => void
 }
 
 interface FieldProps {
@@ -46,6 +47,7 @@ export function ContactEditModal({
   cue,
   schoolName,
   contact,
+  direccion,
   onClose,
   onSaved,
 }: ContactEditModalProps) {
@@ -58,6 +60,7 @@ export function ContactEditModal({
     cargo: contact?.cargo ?? "",
     telefono: contact?.telefono ?? "",
     correo: contact?.correo ?? "",
+    direccion: direccion ?? "",
   })
 
   useEffect(() => {
@@ -79,7 +82,7 @@ export function ContactEditModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const result = await saveContact(cue, contact?.id ?? null, form)
-    if (result) onSaved(result)
+    if (result) onSaved(result, form.direccion.trim().toUpperCase())
   }
 
   const isValid = !!(form.nombre.trim() || form.apellido.trim())
@@ -118,21 +121,29 @@ export function ContactEditModal({
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <Field
+              ref={firstInputRef}
+              icon={<MapPin className="w-4 h-4" />}
+              label="Dirección"
+              value={form.direccion}
+              onChange={handleChange("direccion")}
+              placeholder="CALLE 123 E/ 456 Y 789"
+            />
+
             <div className="grid grid-cols-2 gap-4">
               <Field
-                ref={firstInputRef}
                 icon={<User className="w-4 h-4" />}
                 label="Nombre"
                 value={form.nombre}
                 onChange={handleChange("nombre")}
-                placeholder="María"
+                placeholder="MARÍA"
               />
               <Field
                 icon={<User className="w-4 h-4" />}
                 label="Apellido"
                 value={form.apellido}
                 onChange={handleChange("apellido")}
-                placeholder="González"
+                placeholder="GONZÁLEZ"
               />
             </div>
 

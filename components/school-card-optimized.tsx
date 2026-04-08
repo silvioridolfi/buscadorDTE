@@ -18,9 +18,11 @@ interface SchoolCardOptimizedProps {
 export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCardOptimizedProps) {
   const [editingContact, setEditingContact] = useState(false)
   const [localContact, setLocalContact] = useState<Contact | null | undefined>(school.contacto)
+  const [localDireccion, setLocalDireccion] = useState<string | null | undefined>(school.direccion)
 
-  const handleContactSaved = (updatedContact: Contact) => {
+  const handleContactSaved = (updatedContact: Contact, nuevaDireccion: string) => {
     setLocalContact(updatedContact)
+    setLocalDireccion(nuevaDireccion)
     setEditingContact(false)
   }
 
@@ -78,12 +80,12 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
         </div>
 
         <div className="space-y-2">
-          {school.direccion && (
+          {localDireccion && (
             <div className="flex items-start gap-2">
               <Home className="w-4 h-4 text-[#00AEC3] mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm text-gray-400 uppercase tracking-wide">DIRECCIÓN</p>
-                <p className="text-base font-semibold text-white">{school.direccion}</p>
+                <p className="text-base font-semibold text-white">{localDireccion}</p>
               </div>
             </div>
           )}
@@ -285,6 +287,7 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           cue={school.cue}
           schoolName={school.nombre}
           contact={localContact}
+          direccion={localDireccion}
           onClose={() => setEditingContact(false)}
           onSaved={handleContactSaved}
         />
