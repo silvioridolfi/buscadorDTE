@@ -40,11 +40,11 @@ export function useContactEdit(): UseContactEditReturn {
           const { data: updated, error: updateError } = await supabase
             .from("contactos")
             .update({
-              nombre: data.nombre.trim(),
-              apellido: data.apellido.trim(),
-              cargo: data.cargo.trim(),
+              nombre: data.nombre.trim().toUpperCase(),
+              apellido: data.apellido.trim().toUpperCase(),
+              cargo: data.cargo.trim().toUpperCase(),
               telefono: data.telefono.trim(),
-              correo: data.correo.trim(),
+              correo: data.correo.trim().toLowerCase(),
             })
             .eq("id", existingContactId)
             .select()
@@ -57,11 +57,11 @@ export function useContactEdit(): UseContactEditReturn {
             .from("contactos")
             .insert({
               cue,
-              nombre: data.nombre.trim(),
-              apellido: data.apellido.trim(),
-              cargo: data.cargo.trim(),
+              nombre: data.nombre.trim().toUpperCase(),
+              apellido: data.apellido.trim().toUpperCase(),
+              cargo: data.cargo.trim().toUpperCase(),
               telefono: data.telefono.trim(),
-              correo: data.correo.trim(),
+              correo: data.correo.trim().toLowerCase(),
             })
             .select()
             .single()
