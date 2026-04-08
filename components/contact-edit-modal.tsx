@@ -121,14 +121,31 @@ export function ContactEditModal({
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <Field
-              ref={firstInputRef}
-              icon={<MapPin className="w-4 h-4" />}
-              label="Dirección"
-              value={form.direccion}
-              onChange={handleChange("direccion")}
-              placeholder="CALLE 123 E/ 456 Y 789"
-            />
+
+            {/* Sección establecimiento */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-px flex-1 bg-gray-700" />
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Establecimiento</span>
+                <div className="h-px flex-1 bg-gray-700" />
+              </div>
+              <Field
+                ref={firstInputRef}
+                icon={<MapPin className="w-4 h-4" />}
+                label="Dirección"
+                value={form.direccion}
+                onChange={handleChange("direccion")}
+                placeholder="CALLE 123 E/ 456 Y 789"
+              />
+            </div>
+
+            {/* Sección contacto */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-gray-700" />
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Contacto</span>
+                <div className="h-px flex-1 bg-gray-700" />
+              </div>
 
             <div className="grid grid-cols-2 gap-4">
               <Field
@@ -172,6 +189,8 @@ export function ContactEditModal({
               placeholder="contacto@abc.gob.ar"
               type="email"
             />
+
+            </div>
 
             {error && (
               <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
