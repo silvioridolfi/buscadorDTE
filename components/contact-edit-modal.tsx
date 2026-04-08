@@ -149,7 +149,7 @@ export function ContactEditModal({
               label="Teléfono"
               value={form.telefono}
               onChange={handleChange("telefono")}
-              placeholder="221 4XX-XXXX"
+              placeholder="221 XXX - XXXX"
               type="tel"
             />
 
@@ -158,7 +158,7 @@ export function ContactEditModal({
               label="Correo electrónico"
               value={form.correo}
               onChange={handleChange("correo")}
-              placeholder="contacto@escuela.edu.ar"
+              placeholder="contacto@abc.gob.ar"
               type="email"
             />
 
