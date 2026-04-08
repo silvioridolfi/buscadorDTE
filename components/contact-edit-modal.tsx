@@ -149,7 +149,7 @@ export function ContactEditModal({
               label="Teléfono"
               value={form.telefono}
               onChange={handleChange("telefono")}
-              placeholder="221 XXX - XXXX"
+              placeholder="221XXXXXXX"
               type="tel"
             />
 
