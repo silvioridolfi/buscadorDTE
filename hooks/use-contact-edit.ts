@@ -11,6 +11,8 @@ interface ContactFormData {
   telefono: string
   correo: string
   direccion: string
+  lat: string
+  lon: string
 }
 
 interface UseContactEditReturn {
@@ -40,7 +42,11 @@ export function useContactEdit(): UseContactEditReturn {
         // Actualizar dirección en establecimientos (siempre)
         const { error: direccionError } = await supabase
           .from("establecimientos")
-          .update({ direccion: data.direccion.trim().toUpperCase() })
+          .update({
+            direccion: data.direccion.trim().toUpperCase(),
+            lat: data.lat.trim() ? parseFloat(data.lat.trim()) : null,
+            lon: data.lon.trim() ? parseFloat(data.lon.trim()) : null,
+          })
           .eq("cue", cue)
 
         if (direccionError) throw new Error(`Error al actualizar dirección: ${direccionError.message}`)

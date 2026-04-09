@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, forwardRef } from "react"
-import { X, Save, Loader2, User, Phone, Mail, Briefcase, AlertTriangle, MapPin } from "lucide-react"
+import { X, Save, Loader2, User, Phone, Mail, Briefcase, AlertTriangle, MapPin, Navigation } from "lucide-react"
 import type { Contact } from "@/lib/types"
 import { useContactEdit } from "@/hooks/use-contact-edit"
 
@@ -10,8 +10,10 @@ interface ContactEditModalProps {
   schoolName: string
   contact: Contact | null | undefined
   direccion: string | null | undefined
+  lat: number | null | undefined
+  lon: number | null | undefined
   onClose: () => void
-  onSaved: (updatedContact: Contact, nuevaDireccion: string) => void
+  onSaved: (updatedContact: Contact, nuevaDireccion: string, nuevaLat: number | null, nuevaLon: number | null) => void
 }
 
 interface FieldProps {
@@ -48,6 +50,8 @@ export function ContactEditModal({
   schoolName,
   contact,
   direccion,
+  lat,
+  lon,
   onClose,
   onSaved,
 }: ContactEditModalProps) {
@@ -61,6 +65,8 @@ export function ContactEditModal({
     telefono: contact?.telefono ?? "",
     correo: contact?.correo ?? "",
     direccion: direccion ?? "",
+    lat: lat?.toString() ?? "",
+    lon: lon?.toString() ?? "",
   })
 
   useEffect(() => {
@@ -82,7 +88,11 @@ export function ContactEditModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const result = await saveContact(cue, contact?.id ?? null, form)
-    if (result) onSaved(result, form.direccion.trim().toUpperCase())
+    if (result) {
+      const nuevaLat = form.lat.trim() ? parseFloat(form.lat.trim()) : null
+      const nuevaLon = form.lon.trim() ? parseFloat(form.lon.trim()) : null
+      onSaved(result, form.direccion.trim().toUpperCase(), nuevaLat, nuevaLon)
+    }
   }
 
   const isValid = !!(form.nombre.trim() || form.apellido.trim())
@@ -137,6 +147,24 @@ export function ContactEditModal({
                 onChange={handleChange("direccion")}
                 placeholder="CALLE 123 E/ 456 Y 789"
               />
+              <div className="grid grid-cols-2 gap-4">
+                <Field
+                  icon={<Navigation className="w-4 h-4" />}
+                  label="Latitud"
+                  value={form.lat}
+                  onChange={handleChange("lat")}
+                  placeholder="-34.921453"
+                  type="number"
+                />
+                <Field
+                  icon={<Navigation className="w-4 h-4" />}
+                  label="Longitud"
+                  value={form.lon}
+                  onChange={handleChange("lon")}
+                  placeholder="-57.954453"
+                  type="number"
+                />
+              </div>
             </div>
 
             {/* Sección contacto */}

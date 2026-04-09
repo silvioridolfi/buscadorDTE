@@ -19,10 +19,14 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
   const [editingContact, setEditingContact] = useState(false)
   const [localContact, setLocalContact] = useState<Contact | null | undefined>(school.contacto)
   const [localDireccion, setLocalDireccion] = useState<string | null | undefined>(school.direccion)
+  const [localLat, setLocalLat] = useState<number | null | undefined>(school.lat)
+  const [localLon, setLocalLon] = useState<number | null | undefined>(school.lon)
 
-  const handleContactSaved = (updatedContact: Contact, nuevaDireccion: string) => {
+  const handleContactSaved = (updatedContact: Contact, nuevaDireccion: string, nuevaLat: number | null, nuevaLon: number | null) => {
     setLocalContact(updatedContact)
     setLocalDireccion(nuevaDireccion)
+    setLocalLat(nuevaLat)
+    setLocalLon(nuevaLon)
     setEditingContact(false)
   }
 
@@ -288,6 +292,8 @@ export default function SchoolCardOptimized({ school, onViewDetails }: SchoolCar
           schoolName={school.nombre}
           contact={localContact}
           direccion={localDireccion}
+          lat={localLat}
+          lon={localLon}
           onClose={() => setEditingContact(false)}
           onSaved={handleContactSaved}
         />
